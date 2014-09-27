@@ -45,9 +45,13 @@ object TinderBot {
   def main(args: Array[String]) {
     println("Initiating the tinder bandit!")
 
+    val fbId = args(0)
+    val fbToken = args(1)
+
+    println(fbId)
+
     val tinderBot = new TinderBot
-    //    val tinderAuthToken = tinderBot.requestAuthenticationToken(fbId, fbToken)
-    val tinderAuthToken = "af221eba-8ddd-46f1-9fdb-e7499c7f9d70"
+    val tinderAuthToken = tinderBot.requestAuthenticationToken(fbId, fbToken)
 
     for {
       rec <- tinderBot.getRecommendations(tinderAuthToken)
