@@ -9,7 +9,7 @@ Grab your Facebook oauth token off by visiting this [link](https://www.facebook.
 
 Run:
 ```
-$ sbt run <your-facebook-id> <your-facebook-token>
+$ sbt 'run <your-facebook-id> <your-facebook-token>'
 ```
 
 

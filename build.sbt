@@ -2,9 +2,10 @@ name := "tinder-bandits"
 
 version := "1.0"
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.10.2"
 
 libraryDependencies ++= Seq(
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
-  "org.json4s" %% "json4s-jackson" % "3.2.10"
+  "mysql" % "mysql-connector-java" % "5.1.26",
+  "net.liftweb" %% "lift-json" % "2.5+"
 )
