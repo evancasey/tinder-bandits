@@ -47,6 +47,7 @@ object TinderBot {
 
     while(true) {
       val user = tinderBot.getRecommendation
+
       println(user)
 //      tinderBot.like(user)
 //      tinderBot.respondAll
