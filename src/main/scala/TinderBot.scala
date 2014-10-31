@@ -1,56 +1,38 @@
-import dispatch._
-import dispatch.Defaults._
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import net.liftweb.json._
-import net.liftweb.json.JsonDSL._
 
-class TinderBot(fbId: String, fbToken: String) {
+class TinderBot(tinderClient: TinderClient) {
 
-  implicit val formats = DefaultFormats
+  val client = tinderClient
 
-  private val authToken = requestAuthenticationToken
+  def getRecommendation = {
+    implicit val formats = net.liftweb.json.DefaultFormats
 
-  private def requestAuthenticationToken = {
+    val response = tinderClient.tinderGet("user/recs")
+    val results = (parse(response) \\ "results").children
 
-    val bodyJs = compact(render(("facebook_token" -> fbToken) ~ ("facebook_id" -> fbId)))
-    val req = url("https://api.gotinder.com/auth").POST
-              .setBody(bodyJs)
-              .setContentType("application/json", "UTF-8")
-              .secure
-
-    val response = Http(req OK as.String)
-    Await.result(response, 10 seconds)
-
-    val tokenJs = parse(response()) \\ "token"
-    val authToken = compact(render(tokenJs)).replace("\"", "")
-
-    println("Acquired Tinder Auth Token: " + compact(render(authToken)))
-    authToken
+    println("Getting your recommendations:" )
+    results.map(_.extract[TinderUser]).head
   }
 
-  private def tinderGet(route: String) = {
-    val req = url("https://api.gotinder.com/" + route).GET
-      .addHeader("X-Auth-Token", authToken)
-      .setContentType("application/json", "UTF-8")
-      .secure
 
-    val response = Http(req OK as.String)
-    Await.result(response, 10 seconds)
-    response
+  def like(user: TinderUser) = {
+    val response = tinderClient.tinderGet("like/" + user.`_id`)
+    val results = parse(response)
+
+    println("Liking user: " + user.`_id`)
   }
 
-  def getRecommendations = {
-    val response = tinderGet("user/recs")
-    val recsJs = (parse(response()) \ "response").extractOpt[String]
+  def respondAll = {
+    val updates = tinderClient.tinderPost("updates","some-date")
+    for (update <- updates) {
 
-    val x = 1
+    }
 
+  }
 
-
-//    println("Getting your recommendations:" + compact(render(recs)))
-//    compact(render(recs))
-    List(1)
+  def message(user: TinderUser) = {
+    val response = tinderClient.tinderPost("user/matches" + user.`_id`, "call bandit here")
+    val results = parse(response)
   }
 
 }
@@ -60,13 +42,17 @@ object TinderBot {
   def main(args: Array[String]) {
     println("Initiating the tinder bandit!")
 
-    val tinderBot = new TinderBot(args(0), args(1))
+    val tinderClient = new TinderClient(args(0), args(1))
+    val tinderBot = new TinderBot(tinderClient)
 
-    for {
-      rec <- tinderBot.getRecommendations
-    } yield {
-      rec
+    while(true) {
+      val user = tinderBot.getRecommendation
+      println(user)
+//      tinderBot.like(user)
+//      tinderBot.respondAll
+      Thread.sleep(5000)
     }
+
 
   }
 }
