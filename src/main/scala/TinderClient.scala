@@ -1,6 +1,5 @@
 import dispatch._
 import dispatch.Defaults._
-import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.Await
 import net.liftweb.json._

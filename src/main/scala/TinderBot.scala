@@ -1,10 +1,13 @@
+import bandit.LinUCBBandit
+import model.{Database, TinderUser, UserDao}
 import net.liftweb.json._
 
-class TinderBot(tinderClient: TinderClient) {
+class TinderBot(tinderClient: TinderClient, userDao: UserDao, bandit: LinUCBBandit) {
 
   val client = tinderClient
+  val dao = userDao
 
-  def getRecommendation = {
+  def getRecommendation: TinderUser = {
     implicit val formats = net.liftweb.json.DefaultFormats
 
     val response = tinderClient.tinderGet("user/recs")
@@ -16,10 +19,10 @@ class TinderBot(tinderClient: TinderClient) {
 
 
   def like(user: TinderUser) = {
-    val response = tinderClient.tinderGet("like/" + user.`_id`)
+    val response = tinderClient.tinderGet("like/" + user.id)
     val results = parse(response)
 
-    println("Liking user: " + user.`_id`)
+    println("Liking user: " + user.id)
   }
 
   def respondAll = {
@@ -31,7 +34,7 @@ class TinderBot(tinderClient: TinderClient) {
   }
 
   def message(user: TinderUser) = {
-    val response = tinderClient.tinderPost("user/matches" + user.`_id`, "call bandit here")
+    val response = tinderClient.tinderPost("user/matches" + user.id, "call bandit here")
     val results = parse(response)
   }
 
@@ -42,18 +45,24 @@ object TinderBot {
   def main(args: Array[String]) {
     println("Initiating the tinder bandit!")
 
+    implicit val session = Database.databasePool.createSession()
+
     val tinderClient = new TinderClient(args(0), args(1))
-    val tinderBot = new TinderBot(tinderClient)
+    val userDao = new UserDao
+    val bandit = LinUCBBandit()
+
+    val tinderBot = new TinderBot(tinderClient, userDao, bandit)
 
     while(true) {
       val user = tinderBot.getRecommendation
+
+      userDao.insert(user)
 
       println(user)
 //      tinderBot.like(user)
 //      tinderBot.respondAll
       Thread.sleep(5000)
     }
-
 
   }
 }
