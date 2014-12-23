@@ -12,16 +12,15 @@ abstract class BaseBandit {
    *
    * @return
    */
-  protected def chooseArm(): Arm
+  protected def getSelection: Selection
 
   /**
    *
    * @return
    */
-  def selectArm: Selection = {
-    val arm = chooseArm()
-    dao.incrementRequestCount(arm.id)
-    Selection(arm.id)
+  def selectArm: Arm = {
+    val selection = getSelection
+    dao.selectById(selection.id).head
   }
 
   /**

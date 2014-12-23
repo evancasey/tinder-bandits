@@ -49,7 +49,7 @@ object TinderBot {
 
     val tinderClient = new TinderClient(args(0), args(1))
     val userDao = new UserDao
-    val bandit = LinUCBBandit()
+    val bandit = new LinUCBBandit
 
     val tinderBot = new TinderBot(tinderClient, userDao, bandit)
 

@@ -1,3 +1,4 @@
 package bandit
 
-case class Selection(val id: Long, var value: Double = 0.0)
+case class Selection(val id: Long,
+                     val value: Double = 0.0)

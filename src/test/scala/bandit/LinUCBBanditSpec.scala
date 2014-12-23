@@ -1,5 +1,6 @@
 package bandit
 
+import model.Arm
 import org.scalatest._
 import Matchers._
 
@@ -9,29 +10,31 @@ import Matchers._
 class LinUCBBanditSpec extends WordSpec {
 
   val arm1 = Arm(
-    id = "1",
-    initPullCount = 0,
-    initRequestCount = 0,
-    initValue = 0.0
+    id = 1L,
+    message = "hey babe",
+    pullCount = 0,
+    requestCount = 0,
+    value = 0.0
   )
 
   val arm2 = Arm(
-    id = "2",
-    initPullCount = 0,
-    initRequestCount = 0,
-    initValue = 0.0
+    id = 2L,
+    message = "how's it going?",
+    pullCount = 0,
+    requestCount = 0,
+    value = 0.0
   )
 
   "LinUCBBandit" should {
     "select the 'best' arm correctly" in {
-      val bandit = LinUCBBandit(Seq(arm1, arm2))
+      val bandit = new LinUCBBandit(Seq(arm1, arm2))
       val selection = bandit.selectArm
 
       selection.id shouldEqual arm1.id
     }
 
     "update an arm correctly" in {
-      val bandit = LinUCBBandit(Seq(arm1, arm2))
+      val bandit = new LinUCBBandit(Seq(arm1, arm2))
       val selection = bandit.selectArm
       val updatedArmId = bandit.update(selection)
 
